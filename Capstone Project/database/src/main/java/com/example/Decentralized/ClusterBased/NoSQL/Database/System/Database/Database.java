@@ -10,6 +10,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class Database {
 
     private String name;
-    private Map<String, Collection> collections=new HashMap<>();
-    private ReentrantReadWriteLock collectionLock=new ReentrantReadWriteLock();
+    private Map<String, Collection> collections = new HashMap<>();
+    private ReentrantReadWriteLock collectionLock = new ReentrantReadWriteLock();
 }

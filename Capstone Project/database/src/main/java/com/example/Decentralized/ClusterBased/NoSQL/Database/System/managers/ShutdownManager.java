@@ -1,12 +1,8 @@
 package com.example.Decentralized.ClusterBased.NoSQL.Database.System.managers;
 
-import com.example.Decentralized.ClusterBased.NoSQL.Database.System.Database.Collection;
-import com.example.Decentralized.ClusterBased.NoSQL.Database.System.Database.Database;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PreDestroy;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -38,8 +34,8 @@ public class ShutdownManager {
                         String jsonAffinity = objectMapperAffinity.writeValueAsString(DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getAffinity());
                         JsonNode jsonNodeIndex = objectMapperIndex.readTree(jsonIndex);
                         JsonNode jsonNodeAffinity = objectMapperAffinity.readTree(jsonAffinity);
-                        objectMapperIndex.writeValue(FileManager.createJsonFile(FileManager.storagePath+"/"+databaseName+"/"+collectionName, "index"), jsonNodeIndex);
-                        objectMapperAffinity.writeValue(FileManager.createJsonFile(FileManager.storagePath+"/"+databaseName+"/"+collectionName, "affinity"), jsonNodeAffinity);
+                        objectMapperIndex.writeValue(FileManager.createJsonFile(FileManager.storagePath + "/" + databaseName + "/" + collectionName, "index"), jsonNodeIndex);
+                        objectMapperAffinity.writeValue(FileManager.createJsonFile(FileManager.storagePath + "/" + databaseName + "/" + collectionName, "affinity"), jsonNodeAffinity);
 
                     }
                 }

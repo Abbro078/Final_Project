@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class FileManager {
-    public final static String storagePath="storage";
+    public final static String storagePath = "storage";
 
     public static boolean fileExists(String databasePath) {
         return directoryOrFileExists(databasePath);
@@ -19,18 +19,18 @@ public class FileManager {
     public static void createDirectoryIfNotFound(String directory) throws IOException {
         Files.createDirectories(Paths.get(directory));
     }
+
     private static boolean directoryOrFileExists(String pathForFileOrDirectory) {
         Path path = Paths.get(pathForFileOrDirectory);
         return Files.exists(path);
     }
 
-    public static File createJsonFile(String directory, String jsonName)
-    {
+    public static File createJsonFile(String directory, String jsonName) {
         return new File(directory, jsonName + ".json");
     }
 
-    public static JsonNode getDocument(String databaseName,String collectionName,String documentId) throws IOException {
-        String documentPath=storagePath+"/"+databaseName+"/"+collectionName+"/"+documentId+".json";
+    public static JsonNode getDocument(String databaseName, String collectionName, String documentId) throws IOException {
+        String documentPath = storagePath + "/" + databaseName + "/" + collectionName + "/" + documentId + ".json";
         ObjectMapper mapper = new ObjectMapper();
         File document = new File(documentPath);
         JsonNode documentJson = mapper.readTree(document);

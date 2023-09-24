@@ -5,13 +5,11 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class InitData{
+public class InitData {
     private List<String> ports;
 
     @Override
     public String toString() {
-        return "InitData{" +
-                "ports=" + ports +
-                '}';
+        return "InitData{" + "ports=" + ports + '}';
     }
 }

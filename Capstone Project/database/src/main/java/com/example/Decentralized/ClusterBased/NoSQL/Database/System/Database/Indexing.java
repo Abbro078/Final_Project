@@ -14,16 +14,16 @@ public class Indexing {
     public static void newIndex(String databaseName, String collectionName, String key) throws IOException {
         Database database = DatabaseManager.getInstance().getDatabases().get(databaseName);
         Collection collection = database.getCollections().get(collectionName);
-        File schema =  new File(FileManager.storagePath+"/"+databaseName+"/"+collectionName+"/"+"schema.json");
+        File schema = new File(FileManager.storagePath + "/" + databaseName + "/" + collectionName + "/" + "schema.json");
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(schema);
-        if(DocumentSchema.getAttributeMap(jsonNode).containsKey(key)) {
-            collection.getIndex().put(key,new HashMap<>());
+        if (DocumentSchema.getAttributeMap(jsonNode).containsKey(key)) {
+            collection.getIndex().put(key, new HashMap<>());
 
-            for(String documentId:collection.getDocuments()){
+            for (String documentId : collection.getDocuments()) {
                 Map<String, String> att = DocumentSchema.getAttributeMap(FileManager.getDocument(databaseName, collectionName, documentId));
                 if (att.containsKey(key)) {
-                    if(!collection.getIndex().get(key).containsKey(att.get(key))) {
+                    if (!collection.getIndex().get(key).containsKey(att.get(key))) {
                         IndexObject indexObject = new IndexObject();
                         Map<String, IndexObject> indexObjectMap = new HashMap<>();
                         indexObject.getIndexes().add(att.get("id"));
@@ -35,9 +35,7 @@ public class Indexing {
                     }
                 }
             }
-        }
-        else
-        {
+        } else {
             throw new IOException("the key you want to be indexed is incorrect");
         }
     }
@@ -46,9 +44,9 @@ public class Indexing {
         Database database = DatabaseManager.getInstance().getDatabases().get(databaseName);
         Collection collection = database.getCollections().get(collectionName);
         Map<String, String> att = DocumentSchema.getAttributeMap(FileManager.getDocument(databaseName, collectionName, documentName));
-        for(String key: collection.getIndex().keySet()) {
+        for (String key : collection.getIndex().keySet()) {
             if (att.containsKey(key)) {
-                if(!collection.getIndex().get(key).containsKey(att.get(key))) {
+                if (!collection.getIndex().get(key).containsKey(att.get(key))) {
                     IndexObject indexObject = new IndexObject();
                     Map<String, IndexObject> indexObjectMap = new HashMap<>();
                     indexObject.getIndexes().add(att.get("id"));
@@ -64,11 +62,11 @@ public class Indexing {
 
     public static void removeIndexDocument(String databaseName, String collectionName, String documentName) throws IOException {
         Map<String, String> att = DocumentSchema.getAttributeMap(FileManager.getDocument(databaseName, collectionName, documentName));
-        for(String key: DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getIndex().keySet()) {
+        for (String key : DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getIndex().keySet()) {
             IndexObject existingIndexObject = DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getIndex().get(key).get(att.get(key));
             existingIndexObject.getIndexes().remove(documentName);
 
-            if(existingIndexObject.getIndexes().isEmpty()) {
+            if (existingIndexObject.getIndexes().isEmpty()) {
                 DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getIndex().keySet().remove(key);
             }
         }

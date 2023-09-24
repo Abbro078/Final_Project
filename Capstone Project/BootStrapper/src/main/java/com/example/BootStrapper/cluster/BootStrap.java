@@ -15,10 +15,10 @@ public class BootStrap {
     @PostConstruct
     public static void init() throws IOException, ExecutionException, InterruptedException, TimeoutException {
 
-        Shell.getInstance().runShellCommand("docker network create NoSqlNetwork");
+        Shell.getInstance().runShellCommand("docker network create NoSqlDbNetwork");
 
-        for(int i=8080; i<8082; i++) {
-            String runContainer=String.format("docker run -d -p %s:9000 --network NoSqlNetwork -e Bootstrapper_Port=8000 -e Node_Port=%s --name container%s database_node", i, i, i-8079);
+        for (int i = 8080; i < 8082; i++) {
+            String runContainer = String.format("docker run -d -p %s:9000 --network NoSqlDbNetwork -e Bootstrapper_Port=8000 -e Node_Port=%s --name container%s database_node", i, i, i - 8079);
             Shell.getInstance().runShellCommand(runContainer);
         }
     }

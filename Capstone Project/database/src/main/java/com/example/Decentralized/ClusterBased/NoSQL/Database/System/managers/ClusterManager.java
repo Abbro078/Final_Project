@@ -1,15 +1,13 @@
 package com.example.Decentralized.ClusterBased.NoSQL.Database.System.managers;
 
-import com.example.Decentralized.ClusterBased.NoSQL.Database.System.Database.Database;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class ClusterManager {
-    List<String> ports;
-
     private static volatile ClusterManager instance;
+    List<String> ports;
 
     private ClusterManager() {
     }
@@ -32,7 +30,7 @@ public class ClusterManager {
     }
 
     public static int nextNode() {
-         return (ClusterManager.getInstance().getPorts().indexOf(System.getenv("Node_Port")) + 1) % clusterSize();
+        return (ClusterManager.getInstance().getPorts().indexOf(System.getenv("Node_Port")) + 1) % clusterSize();
 
     }
 

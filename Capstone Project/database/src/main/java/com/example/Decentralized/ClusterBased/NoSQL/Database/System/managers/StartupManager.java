@@ -5,18 +5,14 @@ import com.example.Decentralized.ClusterBased.NoSQL.Database.System.Database.Dat
 import com.example.Decentralized.ClusterBased.NoSQL.Database.System.Database.IndexObject;
 import com.example.Decentralized.ClusterBased.NoSQL.Database.System.services.BootstrappingService;
 import com.example.Decentralized.ClusterBased.NoSQL.Database.System.util.JacksonUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,8 +25,6 @@ import static com.example.Decentralized.ClusterBased.NoSQL.Database.System.manag
 @RequiredArgsConstructor
 public class StartupManager {
 
-    private static final BootstrappingService bootstrappingService = new BootstrappingService();
-
     @PostConstruct
     public static void init() throws IOException, InterruptedException {
         DatabaseManager.getInstance().getDatabases().clear();
@@ -40,7 +34,7 @@ public class StartupManager {
 
 
     public static void loadDatabases(String dir) throws IOException {
-        if(!(new File(dir)).exists())return;
+        if (!(new File(dir)).exists()) return;
         File[] db = Objects.requireNonNull(new File(dir).listFiles());
         for (File file : db) {
             if (file.isDirectory()) {
@@ -54,7 +48,7 @@ public class StartupManager {
         int databaseIndex = databaseName.lastIndexOf("\\");
         Database database = new Database();
         database.setName(databaseName);
-        DatabaseManager.getInstance().getDatabases().put(databaseName,database);
+        DatabaseManager.getInstance().getDatabases().put(databaseName, database);
 
         File[] col = Objects.requireNonNull(new File(String.valueOf(file)).listFiles());
         for (File coll : col) {
@@ -77,20 +71,20 @@ public class StartupManager {
     }
 
     private static void loadIndex(String databaseName, String collectionName) throws IOException {
-        JsonNode index=FileManager.getDocument(databaseName, collectionName,"index");
-        for(String indexAttribute: JacksonUtils.getKeys(index)){
-            JsonNode indexKeyMap=index.get(indexAttribute);
-            for(String indexValue:JacksonUtils.getKeys(indexKeyMap)){
-                JsonNode indexValueMap=indexKeyMap.get(indexValue);
+        JsonNode index = FileManager.getDocument(databaseName, collectionName, "index");
+        for (String indexAttribute : JacksonUtils.getKeys(index)) {
+            JsonNode indexKeyMap = index.get(indexAttribute);
+            for (String indexValue : JacksonUtils.getKeys(indexKeyMap)) {
+                JsonNode indexValueMap = indexKeyMap.get(indexValue);
                 ObjectMapper mapper = new ObjectMapper();
-                List<String> ids=mapper.convertValue(indexValueMap.get("indexes"), ArrayList.class);
-                var theIndex=DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getIndex();
-                if(!theIndex.containsKey(indexAttribute)){
-                    theIndex.put(indexAttribute,new HashMap<>());
+                List<String> ids = mapper.convertValue(indexValueMap.get("indexes"), ArrayList.class);
+                var theIndex = DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getIndex();
+                if (!theIndex.containsKey(indexAttribute)) {
+                    theIndex.put(indexAttribute, new HashMap<>());
                 }
-                IndexObject indexObject=new IndexObject();
+                IndexObject indexObject = new IndexObject();
                 indexObject.setIndexes(ids);
-                theIndex.get(indexAttribute).put(indexValue,indexObject);
+                theIndex.get(indexAttribute).put(indexValue, indexObject);
             }
         }
     }
@@ -102,12 +96,11 @@ public class StartupManager {
                 String documentName = docu.getName();
                 int documentIndex = documentName.lastIndexOf("\\");
                 int documentIndex2 = documentName.lastIndexOf(".");
-                if(documentName.substring(documentIndex + 1, documentIndex2).equals("affinity")) {
-                    int number = readNumberFromFile(FileManager.storagePath+"/"+databaseName+"/"+collectionName+"/"+"affinity.json");
+                if (documentName.substring(documentIndex + 1, documentIndex2).equals("affinity")) {
+                    int number = readNumberFromFile(FileManager.storagePath + "/" + databaseName + "/" + collectionName + "/" + "affinity.json");
                     DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).setAffinity(number);
-                }
-                else if(!documentName.substring(documentIndex + 1, documentIndex2).equals("schema") && !documentName.substring(documentIndex + 1, documentIndex2).equals("index")) {
-                    DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocuments().add(documentName.substring(documentIndex + 1,documentIndex2));
+                } else if (!documentName.substring(documentIndex + 1, documentIndex2).equals("schema") && !documentName.substring(documentIndex + 1, documentIndex2).equals("index")) {
+                    DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocuments().add(documentName.substring(documentIndex + 1, documentIndex2));
                 }
             }
         }

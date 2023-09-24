@@ -1,7 +1,9 @@
 package com.example.Decentralized.ClusterBased.NoSQL.Database.System.services;
 
-import com.example.Decentralized.ClusterBased.NoSQL.Database.System.Database.*;
 import com.example.Decentralized.ClusterBased.NoSQL.Database.System.Database.Collection;
+import com.example.Decentralized.ClusterBased.NoSQL.Database.System.Database.Database;
+import com.example.Decentralized.ClusterBased.NoSQL.Database.System.Database.DocumentSchema;
+import com.example.Decentralized.ClusterBased.NoSQL.Database.System.Database.Indexing;
 import com.example.Decentralized.ClusterBased.NoSQL.Database.System.managers.DatabaseManager;
 import com.example.Decentralized.ClusterBased.NoSQL.Database.System.managers.FileManager;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,70 +20,68 @@ import java.util.*;
 public class DocumentService {
     public void createDocument(String databaseName, String collectionName, String jsonDocument, Optional<String> id) throws IOException {
         DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().writeLock().lock();
-        try{
+        try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(jsonDocument);
-            String theId ;
-            if(id.isPresent()) {
+            String theId;
+            if (id.isPresent()) {
                 theId = id.get();
             } else {
                 UUID uuid = UUID.randomUUID();
-                theId= uuid.toString().substring(0, 8);
+                theId = uuid.toString().substring(0, 8);
             }
             ((ObjectNode) jsonNode).put("id", theId);
 
-            Database database= DatabaseManager.getInstance().getDatabases().get(databaseName);
-            Collection collection= database.getCollections().get(collectionName);
+            Database database = DatabaseManager.getInstance().getDatabases().get(databaseName);
+            Collection collection = database.getCollections().get(collectionName);
 
 
-            if (!FileManager.fileExists(FileManager.storagePath+"/"+databaseName)) {
+            if (!FileManager.fileExists(FileManager.storagePath + "/" + databaseName)) {
                 System.out.println("database doesnt exists");
                 return;
             }
 
-            if (!FileManager.fileExists(FileManager.storagePath+"/"+databaseName+"/"+collectionName)) {
+            if (!FileManager.fileExists(FileManager.storagePath + "/" + databaseName + "/" + collectionName)) {
                 System.out.println("collection doesnt exists");
                 return;
             }
 
-            if (FileManager.fileExists(FileManager.storagePath + "/" + databaseName + "/" + collectionName+"/"+theId+".json")) {
+            if (FileManager.fileExists(FileManager.storagePath + "/" + databaseName + "/" + collectionName + "/" + theId + ".json")) {
                 System.out.println("document already exists");
             } else {
-                if(DocumentSchema.verifyJsonFileWithSchema(jsonNode,FileManager.getDocument(databaseName,collectionName,"schema"))){
-                    objectMapper.writeValue(FileManager.createJsonFile(FileManager.storagePath+"/"+databaseName+"/"+collectionName, theId), jsonNode);
+                if (DocumentSchema.verifyJsonFileWithSchema(jsonNode, FileManager.getDocument(databaseName, collectionName, "schema"))) {
+                    objectMapper.writeValue(FileManager.createJsonFile(FileManager.storagePath + "/" + databaseName + "/" + collectionName, theId), jsonNode);
                     collection.getDocuments().add(theId);
                     Indexing.indexDocument(databaseName, collectionName, theId);
-                }
-                else
-                    System.out.println("The document doest follow the schema");
+                } else System.out.println("The document doest follow the schema");
             }
-        }finally {
+        } finally {
             DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().writeLock().unlock();
         }
     }
 
     public void deleteDocument(String databaseName, String collectionName, String documentName) {
         DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().writeLock().lock();
-        try{
+        try {
 
-            if (!FileManager.fileExists(FileManager.storagePath+"/"+databaseName)) {
+            if (!FileManager.fileExists(FileManager.storagePath + "/" + databaseName)) {
                 System.out.println("db doesnt exists");
                 return;
             }
 
-            if (!FileManager.fileExists(FileManager.storagePath+"/"+databaseName+"/"+collectionName)) {
+            if (!FileManager.fileExists(FileManager.storagePath + "/" + databaseName + "/" + collectionName)) {
                 System.out.println("collection doesnt exists");
                 return;
             }
 
-            if (!FileManager.fileExists(FileManager.storagePath+"/"+databaseName+"/"+collectionName+"/"+documentName+".json")) {
+            if (!FileManager.fileExists(FileManager.storagePath + "/" + databaseName + "/" + collectionName + "/" + documentName + ".json")) {
                 System.out.println("document doesnt exists");
                 return;
             }
 
             Indexing.removeIndexDocument(databaseName, collectionName, documentName);
 
-            if(FileSystemUtils.deleteRecursively(new File(FileManager.storagePath+"/"+databaseName+"/"+collectionName, documentName + ".json"))) {
+            if (FileSystemUtils.deleteRecursively(new File(FileManager.storagePath + "/" + databaseName + "/" + collectionName, documentName + ".json"))) {
                 System.out.println("document deleted successfully");
                 DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocuments().remove(documentName);
             } else {
@@ -96,26 +96,26 @@ public class DocumentService {
 
     public void updateDocument(String databaseName, String collectionName, String documentName, String jsonDocument) {
         DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().writeLock().lock();
-        try{
-            if (!FileManager.fileExists(FileManager.storagePath+"/"+databaseName)) {
+        try {
+            if (!FileManager.fileExists(FileManager.storagePath + "/" + databaseName)) {
                 System.out.println("db doesnt exists");
                 return;
             }
 
-            if (!FileManager.fileExists(FileManager.storagePath+"/"+databaseName+"/"+collectionName)) {
+            if (!FileManager.fileExists(FileManager.storagePath + "/" + databaseName + "/" + collectionName)) {
                 System.out.println("collection doesnt exists");
                 return;
             }
 
-            if (!FileManager.fileExists(FileManager.storagePath+"/"+databaseName+"/"+collectionName+"/"+documentName+".json")) {
+            if (!FileManager.fileExists(FileManager.storagePath + "/" + databaseName + "/" + collectionName + "/" + documentName + ".json")) {
                 System.out.println("document doesnt exists");
                 return;
             }
 
             ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode data = objectMapper.readTree(new File(FileManager.storagePath+"/"+databaseName+"/"+collectionName+"/"+documentName+".json"));
+            JsonNode data = objectMapper.readTree(new File(FileManager.storagePath + "/" + databaseName + "/" + collectionName + "/" + documentName + ".json"));
             JsonNode jsonNode = objectMapper.readTree(jsonDocument);
-            Map<String,String> newData = DocumentSchema.getAttributeMap(jsonNode);
+            Map<String, String> newData = DocumentSchema.getAttributeMap(jsonNode);
 
             ObjectNode dataNode;
             if (data.isObject()) {
@@ -124,15 +124,15 @@ public class DocumentService {
                 dataNode = objectMapper.createObjectNode();
             }
 
-            for(String key : newData.keySet()) {
-                dataNode.put(key,newData.get(key));
+            for (String key : newData.keySet()) {
+                dataNode.put(key, newData.get(key));
             }
 
 
-            if(DocumentSchema.verifyJsonFileWithSchema(dataNode,FileManager.getDocument(databaseName,collectionName,"schema"))){
+            if (DocumentSchema.verifyJsonFileWithSchema(dataNode, FileManager.getDocument(databaseName, collectionName, "schema"))) {
                 Indexing.removeIndexDocument(databaseName, collectionName, documentName);
-                objectMapper.writeValue(FileManager.createJsonFile(FileManager.storagePath+"/"+databaseName+"/"+collectionName, documentName), dataNode);
-                Indexing.indexDocument(databaseName,collectionName,documentName);
+                objectMapper.writeValue(FileManager.createJsonFile(FileManager.storagePath + "/" + databaseName + "/" + collectionName, documentName), dataNode);
+                Indexing.indexDocument(databaseName, collectionName, documentName);
             }
 
         } catch (IOException e) {
@@ -145,15 +145,15 @@ public class DocumentService {
 
     public List<JsonNode> getAll(String databaseName, String collectionName) throws IOException {
         DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().readLock().lock();
-        try{
+        try {
             Database database = DatabaseManager.getInstance().getDatabases().get(databaseName);
-            Collection collection= database.getCollections().get(collectionName);
-            List<JsonNode> documents=new ArrayList<>();
-            for(String documentId:collection.getDocuments()){
-                documents.add(FileManager.getDocument(databaseName,collectionName,documentId));
+            Collection collection = database.getCollections().get(collectionName);
+            List<JsonNode> documents = new ArrayList<>();
+            for (String documentId : collection.getDocuments()) {
+                documents.add(FileManager.getDocument(databaseName, collectionName, documentId));
             }
             return documents;
-        }finally {
+        } finally {
             DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().readLock().unlock();
         }
     }
