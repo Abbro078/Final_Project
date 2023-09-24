@@ -33,7 +33,6 @@ public class DocumentService {
             Database database= DatabaseManager.getInstance().getDatabases().get(databaseName);
             Collection collection= database.getCollections().get(collectionName);
 
-            //TODO ADD DOCUMENT TO EXISTING INDICES #DONE
 
             if (!FileManager.fileExists(FileManager.storagePath+"/"+databaseName)) {
                 System.out.println("database doesnt exists");

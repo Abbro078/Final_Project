@@ -101,7 +101,7 @@ public class CollectionController {
     }
 
     @GetMapping("/delete")
-    public String deleteCollection(@RequestParam String databaseName, @RequestParam String collectionName, @RequestParam(required = false) Boolean propagate, @RequestParam(required = false) Boolean fromAffinityNode) {        //send request to all other nodes
+    public String deleteCollection(@RequestParam String databaseName, @RequestParam String collectionName, @RequestParam(required = false) Boolean propagate, @RequestParam(required = false) Boolean fromAffinityNode) {
         if(ClusterManager.nodeIndex() == DatabaseManager.getAffinityNode(databaseName, collectionName) || (fromAffinityNode != null && fromAffinityNode)) {
             collectionService.deleteCollection(databaseName, collectionName);
             if (propagate == null || propagate) {
