@@ -15,11 +15,12 @@ import org.springframework.util.FileSystemUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Service
 public class DocumentService {
     public void createDocument(String databaseName, String collectionName, String jsonDocument, Optional<String> id) throws IOException {
-        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().writeLock().lock();
+//        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().writeLock().lock();
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(jsonDocument);
@@ -53,15 +54,20 @@ public class DocumentService {
                     objectMapper.writeValue(FileManager.createJsonFile(FileManager.storagePath + "/" + databaseName + "/" + collectionName, theId), jsonNode);
                     collection.getDocuments().add(theId);
                     Indexing.indexDocument(databaseName, collectionName, theId);
-                } else System.out.println("The document doest follow the schema");
+                    DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().put(theId, new ReentrantReadWriteLock());
+                } else {
+                    System.out.println("The document doest follow the schema");
+                }
             }
         } finally {
-            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().writeLock().unlock();
+//            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().writeLock().unlock();
         }
     }
 
     public void deleteDocument(String databaseName, String collectionName, String documentName) {
-        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().writeLock().lock();
+//        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().writeLock().lock();
+        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().get(documentName).writeLock().lock();
+        boolean deleted = false;
         try {
 
             if (!FileManager.fileExists(FileManager.storagePath + "/" + databaseName)) {
@@ -84,18 +90,24 @@ public class DocumentService {
             if (FileSystemUtils.deleteRecursively(new File(FileManager.storagePath + "/" + databaseName + "/" + collectionName, documentName + ".json"))) {
                 System.out.println("document deleted successfully");
                 DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocuments().remove(documentName);
+                deleted=true;
             } else {
                 System.out.println("failed to delete document");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
-            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().writeLock().unlock();
+            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().get(documentName).writeLock().unlock();
+            if(deleted) {
+                DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().remove(documentName);
+            }
+//            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().writeLock().unlock();
         }
     }
 
     public void updateDocument(String databaseName, String collectionName, String documentName, String jsonDocument) {
-        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().writeLock().lock();
+//        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().writeLock().lock();
+        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().get(documentName).writeLock().lock();
         try {
             if (!FileManager.fileExists(FileManager.storagePath + "/" + databaseName)) {
                 System.out.println("db doesnt exists");
@@ -138,13 +150,15 @@ public class DocumentService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
-            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().writeLock().unlock();
+//            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().writeLock().unlock();
+            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().get(documentName).writeLock().lock();
         }
     }
 
 
     public List<JsonNode> getAll(String databaseName, String collectionName) throws IOException {
-        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().readLock().lock();
+//        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().readLock().lock();
+        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().forEach((s, reentrantReadWriteLock) -> reentrantReadWriteLock.readLock().lock());
         try {
             Database database = DatabaseManager.getInstance().getDatabases().get(databaseName);
             Collection collection = database.getCollections().get(collectionName);
@@ -154,7 +168,8 @@ public class DocumentService {
             }
             return documents;
         } finally {
-            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().readLock().unlock();
+//            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().readLock().unlock();
+            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollections().get(collectionName).getDocumentLock().forEach((s, reentrantReadWriteLock) -> reentrantReadWriteLock.readLock().unlock());
         }
     }
 

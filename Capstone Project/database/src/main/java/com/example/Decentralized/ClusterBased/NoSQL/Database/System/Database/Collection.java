@@ -15,7 +15,8 @@ public class Collection {
     private String name;
     private List<String> documents = new ArrayList<>();
     private List<String> keyIndex = new ArrayList<>();
-    private ReadWriteLock documentLock = new ReentrantReadWriteLock();
+//    private ReadWriteLock documentLock = new ReentrantReadWriteLock();
+    private Map<String, ReentrantReadWriteLock> documentLock = new HashMap<>();
     private int affinity;
 
     private Map<String, Map<String, IndexObject>> index = new HashMap<>();

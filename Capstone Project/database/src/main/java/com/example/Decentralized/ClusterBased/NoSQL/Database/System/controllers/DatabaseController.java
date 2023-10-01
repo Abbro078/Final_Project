@@ -25,7 +25,7 @@ public class DatabaseController {
     }
 
     @PostMapping("")
-    public String createDatabase(@RequestParam String databaseName, @RequestParam(required = false) Boolean propagate) throws IOException {
+    public String createDatabase(@RequestParam String databaseName, @RequestParam(required = false) Boolean propagate) throws IOException, InterruptedException {
         dataBaseService.createDatabase(databaseName);
         if (propagate == null || propagate) {
             if (loadBalancingManager.isRedirectRequired()) {
