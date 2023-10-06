@@ -20,5 +20,4 @@ public class Collection {
     private int affinity;
 
     private Map<String, Map<String, IndexObject>> index = new HashMap<>();
-
 }

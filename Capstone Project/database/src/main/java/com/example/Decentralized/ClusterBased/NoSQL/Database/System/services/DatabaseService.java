@@ -3,6 +3,7 @@ package com.example.Decentralized.ClusterBased.NoSQL.Database.System.services;
 import com.example.Decentralized.ClusterBased.NoSQL.Database.System.Database.Database;
 import com.example.Decentralized.ClusterBased.NoSQL.Database.System.managers.DatabaseManager;
 import com.example.Decentralized.ClusterBased.NoSQL.Database.System.managers.FileManager;
+import com.example.Decentralized.ClusterBased.NoSQL.Database.System.managers.LockManager;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 
@@ -33,7 +34,7 @@ public class DatabaseService {
     }
 
     public void deleteDatabase(String databaseName) {
-        DatabaseManager.getInstance().getDatabaseLock().get(databaseName).writeLock().lock();
+        LockManager.writeLockDatabase(databaseName);
         boolean deleted = false;
 //        DatabaseManager.getInstance().getDatabaseLock().writeLock().lock();
         try {
@@ -50,7 +51,7 @@ public class DatabaseService {
                 System.out.println("failed to delete database");
             }
         } finally {
-            DatabaseManager.getInstance().getDatabaseLock().get(databaseName).writeLock().lock();
+            LockManager.writeUnlockDatabase(databaseName);
             if(deleted) {
                 DatabaseManager.getInstance().getDatabaseLock().remove(databaseName);
             }
@@ -60,11 +61,13 @@ public class DatabaseService {
 
     public List<String> getDatabases() {
 //        DatabaseManager.getInstance().getDatabaseLock().readLock().lock();
-        DatabaseManager.getInstance().getDatabaseLock().forEach((s, reentrantReadWriteLock) -> reentrantReadWriteLock.readLock().lock());
+//        DatabaseManager.getInstance().getDatabaseLock().forEach((s, reentrantReadWriteLock) -> reentrantReadWriteLock.readLock().lock());
+        LockManager.writeLockDatabases();
         try {
             return DatabaseManager.getInstance().getDatabases().keySet().stream().toList();
         } finally {
-            DatabaseManager.getInstance().getDatabaseLock().forEach((s, reentrantReadWriteLock) -> reentrantReadWriteLock.readLock().unlock());
+            LockManager.writeUnlockDatabases();
+//            DatabaseManager.getInstance().getDatabaseLock().forEach((s, reentrantReadWriteLock) -> reentrantReadWriteLock.readLock().unlock());
 //            DatabaseManager.getInstance().getDatabaseLock().readLock().unlock();
         }
     }

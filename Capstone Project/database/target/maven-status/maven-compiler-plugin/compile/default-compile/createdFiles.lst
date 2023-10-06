@@ -8,6 +8,7 @@ com\example\Decentralized\ClusterBased\NoSQL\Database\System\managers\LoadBalanc
 com\example\Decentralized\ClusterBased\NoSQL\Database\System\Database\IndexObject.class
 com\example\Decentralized\ClusterBased\NoSQL\Database\System\managers\LoadBalancingManager$1.class
 com\example\Decentralized\ClusterBased\NoSQL\Database\System\util\JacksonUtils.class
+com\example\Decentralized\ClusterBased\NoSQL\Database\System\managers\LockManager.class
 com\example\Decentralized\ClusterBased\NoSQL\Database\System\Database\Collection.class
 com\example\Decentralized\ClusterBased\NoSQL\Database\System\controllers\CollectionController.class
 com\example\Decentralized\ClusterBased\NoSQL\Database\System\Database\DocumentSchema.class

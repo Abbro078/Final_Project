@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class DatabaseManager {
     private static volatile DatabaseManager instance;
     private HashMap<String, Database> databases = new HashMap<>();
-//    private ReentrantReadWriteLock databaseLock = new ReentrantReadWriteLock();
+    private ReentrantReadWriteLock databasesLock = new ReentrantReadWriteLock();
     private Map<String, ReentrantReadWriteLock> databaseLock = new HashMap<>();
 
     private DatabaseManager() {

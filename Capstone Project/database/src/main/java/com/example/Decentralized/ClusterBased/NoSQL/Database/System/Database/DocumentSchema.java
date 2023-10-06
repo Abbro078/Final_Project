@@ -30,7 +30,7 @@ public class DocumentSchema {
         }
         boolean hasId = attributeMap.containsKey("id");
         if (!hasId) {
-            ((ObjectNode) docSchema).put("id", "schema");
+            ((ObjectNode) docSchema).put("id", "STRING");
         }
         return true;
     }

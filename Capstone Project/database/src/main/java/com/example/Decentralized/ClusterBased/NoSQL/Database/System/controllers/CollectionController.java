@@ -56,30 +56,30 @@ public class CollectionController {
         return ResponseEntity.ok(collectionService.getSchema(databaseName, collectionName));
     }
 
-    @PutMapping
+    @GetMapping("/index")
     public String newIndex(@RequestParam String databaseName, @RequestParam String collectionName, @RequestParam String key, @RequestParam(required = false) Boolean propagate, @RequestParam(required = false) Boolean fromAffinityNode) throws IOException {
 
-        if (ClusterManager.nodeIndex() == DatabaseManager.getAffinityNode(databaseName, collectionName) || (fromAffinityNode != null && fromAffinityNode)) {
+//        if (ClusterManager.nodeIndex() == DatabaseManager.getAffinityNode(databaseName, collectionName) || (fromAffinityNode != null && fromAffinityNode)) {
             collectionService.newIndex(databaseName, collectionName, key);
             if (propagate == null || propagate) {
                 if (loadBalancingManager.isRedirectRequired()) {
                     System.out.println("This request will be redirected to a different node");
                     String uri = RequestManager.buildUri(ClusterManager.get(ClusterManager.nextNode()), "/collection", databaseName, collectionName, null, key, null, null);
-                    restTemplate.put(uri, null, String.class);
+                    restTemplate.getForEntity(uri, null, String.class);
                 } else {
                     loadBalancingManager.logRequest();
                     for (String node : ClusterManager.getInstance().getPorts()) {
                         if (!node.equals(System.getenv("Node_Port"))) {
                             String uri = RequestManager.buildUri(node, "/collection", databaseName, collectionName, null, key, false, true);
-                            restTemplate.put(uri, null, String.class);
+                            restTemplate.getForEntity(uri, null, String.class);
                         }
                     }
                 }
             }
-        } else {
-            String uri = RequestManager.buildUri(ClusterManager.get(DatabaseManager.getAffinityNode(databaseName, collectionName)), "/collection", databaseName, collectionName, null, key, null, null);
-            restTemplate.put(uri, null, String.class);
-        }
+//        } else {
+//            String uri = RequestManager.buildUri(ClusterManager.get(DatabaseManager.getAffinityNode(databaseName, collectionName)), "/collection", databaseName, collectionName, null, key, null, null);
+//            restTemplate.getForEntity(uri, null, String.class);
+//        }
         return "New key indexed";
     }
 
