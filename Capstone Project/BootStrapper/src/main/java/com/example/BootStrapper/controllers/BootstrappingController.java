@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("database")
 @RequiredArgsConstructor
@@ -29,16 +31,22 @@ public class BootstrappingController {
         return ResponseEntity.ok(bootstrappingService.getUsers());
     }
 
-    @PostMapping("login")
+    @PostMapping("/login")
     public ResponseEntity<?> login(@RequestParam String username, @RequestParam String password) {
         if (!bootstrappingService.login(username, password)) {
             System.out.println("wrong credentials");
             KeyValuePair response = new KeyValuePair("credential", false);
-            return ResponseEntity.ok(response);
+            return (ResponseEntity<?>) ResponseEntity.badRequest();
         } else {
             KeyValuePair response = new KeyValuePair("credential", true);
             return ResponseEntity.ok(response);
         }
+    }
+
+    @PostMapping("/register")
+    public String register(@RequestParam String username, @RequestParam String password) throws IOException {
+        bootstrappingService.register(username, password);
+        return ("register was successful i think");
     }
 
 }

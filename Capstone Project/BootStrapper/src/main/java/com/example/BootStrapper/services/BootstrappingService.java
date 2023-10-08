@@ -1,6 +1,8 @@
 package com.example.BootStrapper.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -20,6 +22,23 @@ public class BootstrappingService {
     public boolean login(String username, String password) {
         System.out.println(users);
         return users.containsKey(username) && users.get(username).equals(password);
+    }
+
+    public String register(String username, String password) throws IOException {
+        if (users.containsKey(username))
+            return "this username already exists";
+        else {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonObject = objectMapper.readTree(new File("users" + "/users.json"));
+            JsonNode newNode = objectMapper.createObjectNode().textNode(password);
+            ((ObjectNode) jsonObject).set(username, newNode);
+            objectMapper.writeValue(new File("users" + "/users.json"), jsonObject);
+            users.put(username, password);
+//            users.put(username,password);
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            objectMapper.writeValue();
+            return "Successful sign up";
+        }
     }
 
     public List<String> getUsers() {
