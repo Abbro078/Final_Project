@@ -19,7 +19,6 @@ public class Indexing {
         JsonNode jsonNode = objectMapper.readTree(schema);
         if (DocumentSchema.getAttributeMap(jsonNode).containsKey(key)) {
             collection.getIndex().put(key, new HashMap<>());
-
             for (String documentId : collection.getDocuments()) {
                 Map<String, String> att = DocumentSchema.getAttributeMap(FileManager.getDocument(databaseName, collectionName, documentId));
                 if (att.containsKey(key)) {

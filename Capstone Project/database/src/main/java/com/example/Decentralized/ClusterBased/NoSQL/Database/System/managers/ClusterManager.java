@@ -31,7 +31,6 @@ public class ClusterManager {
 
     public static int nextNode() {
         return (ClusterManager.getInstance().getPorts().indexOf(System.getenv("Node_Port")) + 1) % clusterSize();
-
     }
 
     public static String get(int port) {

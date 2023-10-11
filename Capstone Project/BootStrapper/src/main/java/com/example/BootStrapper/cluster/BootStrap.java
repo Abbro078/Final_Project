@@ -17,7 +17,7 @@ public class BootStrap {
 
         Shell.getInstance().runShellCommand("docker network create NoSqlDbNetwork");
 
-        for (int i = 8080; i < 8082; i++) {
+        for (int i = 8080; i < 8084; i++) {
             String runContainer = String.format("docker run -d -p %s:9000 --network NoSqlDbNetwork -e Bootstrapper_Port=8000 -e Node_Port=%s --name container%s database_node", i, i, i - 8079);
             Shell.getInstance().runShellCommand(runContainer);
         }

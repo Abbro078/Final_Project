@@ -36,7 +36,6 @@ public class ShutdownManager {
                         JsonNode jsonNodeAffinity = objectMapperAffinity.readTree(jsonAffinity);
                         objectMapperIndex.writeValue(FileManager.createJsonFile(FileManager.storagePath + "/" + databaseName + "/" + collectionName, "index"), jsonNodeIndex);
                         objectMapperAffinity.writeValue(FileManager.createJsonFile(FileManager.storagePath + "/" + databaseName + "/" + collectionName, "affinity"), jsonNodeAffinity);
-
                     }
                 }
             }

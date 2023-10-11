@@ -45,7 +45,7 @@ public class LoadBalancingManager {
     }
 
     public boolean isRedirectRequired() {
-        return getRequestsInLastMinute() > 5;
+        return getRequestsInLastMinute() > 10;
     }
 
 }

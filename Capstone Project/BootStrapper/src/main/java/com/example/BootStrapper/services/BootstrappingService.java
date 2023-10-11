@@ -34,9 +34,6 @@ public class BootstrappingService {
             ((ObjectNode) jsonObject).set(username, newNode);
             objectMapper.writeValue(new File("users" + "/users.json"), jsonObject);
             users.put(username, password);
-//            users.put(username,password);
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            objectMapper.writeValue();
             return "Successful sign up";
         }
     }

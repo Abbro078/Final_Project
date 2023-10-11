@@ -8,6 +8,13 @@ public class LockManager {
     public static void writeUnlockDatabases() {
         DatabaseManager.getInstance().getDatabasesLock().writeLock().unlock();
     }
+    public static void readLockDatabases() {
+        DatabaseManager.getInstance().getDatabasesLock().readLock().unlock();
+    }
+    public static void readUnlockDatabases() {
+        DatabaseManager.getInstance().getDatabasesLock().readLock().unlock();
+    }
+
     public static void writeLockDatabase(String databaseName) {
         DatabaseManager.getInstance().getDatabaseLock().get(databaseName).writeLock().lock();
     }

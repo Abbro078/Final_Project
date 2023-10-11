@@ -26,7 +26,6 @@ import static com.example.Decentralized.ClusterBased.NoSQL.Database.System.Datab
 public class CollectionService {
 
     public void createCollection(String databaseName, String collectionName, String schema) throws IOException {
-//        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().writeLock().lock();
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(schema);
@@ -50,13 +49,12 @@ public class CollectionService {
                     System.out.println("Failed to create collection");
                 }
             }
-        } finally {
-//            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().writeLock().unlock();
+        } catch(Exception e){
+            System.out.println(e);
         }
     }
 
     public void deleteCollection(String databaseName, String collectionName) {
-//        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().writeLock().lock();
         LockManager.writeLockCollection(databaseName,collectionName);
         boolean deleted = false;
         try {
@@ -82,13 +80,10 @@ public class CollectionService {
             if(deleted) {
                 DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().remove(collectionName);
             }
-//            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().writeLock().unlock();
         }
     }
 
     public List<CollectionResponse> getCollections(String databaseName) {
-//        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().readLock().lock();
-//        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().forEach((s, reentrantReadWriteLock) -> reentrantReadWriteLock.readLock().lock());
         LockManager.readLockDatabase(databaseName);
         try {
             List<CollectionResponse> collections = new ArrayList<>();
@@ -98,8 +93,6 @@ public class CollectionService {
             return collections;
         } finally {
             LockManager.readUnlockDatabase(databaseName);
-//            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().forEach((s, reentrantReadWriteLock) -> reentrantReadWriteLock.readLock().unlock());
-//            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().readLock().unlock();
         }
     }
 
@@ -109,21 +102,15 @@ public class CollectionService {
 
     public void newIndex(String databaseName, String collectionName, String key) throws IOException {
         LockManager.readLockDatabase(databaseName);
-//        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().forEach((s, reentrantReadWriteLock) -> reentrantReadWriteLock.readLock().lock());
-//        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().writeLock().lock();
         try {
             Indexing.newIndex(databaseName, collectionName, key);
         } finally {
             LockManager.readUnlockDatabase(databaseName);
-//            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().writeLock().unlock();
-//            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().forEach((s, reentrantReadWriteLock) -> reentrantReadWriteLock.readLock().unlock());
         }
     }
 
 
     public List<JsonNode> filterByKey(String databaseName, String collectionName, String key) throws IOException {
-//        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().readLock().lock();
-//        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().forEach((s, reentrantReadWriteLock) -> reentrantReadWriteLock.readLock().lock());
         LockManager.readLockDatabase(databaseName);
         try {
             List<JsonNode> documents = new ArrayList<>();
@@ -137,14 +124,10 @@ public class CollectionService {
             return documents;
         } finally {
             LockManager.readUnlockDatabase(databaseName);
-//            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().forEach((s, reentrantReadWriteLock) -> reentrantReadWriteLock.readLock().unlock());
-//            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().readLock().unlock();
         }
     }
 
     public List<JsonNode> filterByValue(String databaseName, String collectionName, String key, String value) throws IOException {
-//        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().forEach((s, reentrantReadWriteLock) -> reentrantReadWriteLock.readLock().lock());
-//        DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().readLock().lock();
         LockManager.readLockDatabase(databaseName);
         try {
             List<JsonNode> documents = new ArrayList<>();
@@ -161,8 +144,6 @@ public class CollectionService {
             return documents;
         } finally {
             LockManager.readUnlockDatabase(databaseName);
-//            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().readLock().unlock();
-//            DatabaseManager.getInstance().getDatabases().get(databaseName).getCollectionLock().forEach((s, reentrantReadWriteLock) -> reentrantReadWriteLock.readLock().unlock());
         }
     }
 }

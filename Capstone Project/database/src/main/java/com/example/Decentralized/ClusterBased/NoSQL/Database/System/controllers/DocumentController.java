@@ -11,7 +11,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.util.Optional;
 
-
 @RestController
 @RequestMapping(path = "/document")
 public class DocumentController {
@@ -31,7 +30,6 @@ public class DocumentController {
             documentService.createDocument(databaseName, collectionName, jsonDocument, id);
             if (propagate == null || propagate) {
                 if (loadBalancingManager.isRedirectRequired()) {
-                    System.out.println("This request will be redirected to a different node");
                     String uri = RequestManager.buildUri(ClusterManager.get(ClusterManager.nextNode()), "/document", databaseName, collectionName, null, null, null, null);
                     restTemplate.postForObject(uri, jsonDocument, String.class);
                 } else {
@@ -58,7 +56,6 @@ public class DocumentController {
             documentService.deleteDocument(databaseName, collectionName, documentName);
             if (propagate == null || propagate) {
                 if (loadBalancingManager.isRedirectRequired()) {
-                    System.out.println("This request will be redirected to a different node");
                     String uri = RequestManager.buildUri(ClusterManager.get(ClusterManager.nextNode()), "/document/delete", databaseName, collectionName, documentName, null, null, null);
                     restTemplate.getForEntity(uri, null, String.class);
                 } else {
@@ -97,7 +94,6 @@ public class DocumentController {
             documentService.updateDocument(databaseName, collectionName, documentName, jsonDocument);
             if (propagate == null || propagate) {
                 if (loadBalancingManager.isRedirectRequired()) {
-                    System.out.println("This request will be redirected to a different node");
                     String uri = RequestManager.buildUri(ClusterManager.get(ClusterManager.nextNode()), "/document/update", databaseName, collectionName, documentName, null, null, null);
                     restTemplate.postForObject(uri, jsonDocument, String.class);
                 } else {
@@ -116,5 +112,4 @@ public class DocumentController {
         }
         return "Document has been updated";
     }
-
 }

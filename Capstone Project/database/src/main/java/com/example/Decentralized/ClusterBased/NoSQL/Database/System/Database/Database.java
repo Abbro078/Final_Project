@@ -11,6 +11,6 @@ public class Database {
 
     private String name;
     private Map<String, Collection> collections = new HashMap<>();
-//    private ReentrantReadWriteLock collectionLock = new ReentrantReadWriteLock();
     private Map<String, ReentrantReadWriteLock> collectionLock = new HashMap<>();
+
 }

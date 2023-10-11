@@ -29,7 +29,7 @@ public class DatabaseController {
         dataBaseService.createDatabase(databaseName);
         if (propagate == null || propagate) {
             if (loadBalancingManager.isRedirectRequired()) {
-                System.out.println("This request will be redirected to a different node");
+
                 String uri = RequestManager.buildUri(ClusterManager.get(ClusterManager.nextNode()), "/database", databaseName, null, null, null, null, null);
                 restTemplate.postForEntity(uri, null, String.class);
             } else {
@@ -47,11 +47,9 @@ public class DatabaseController {
 
     @GetMapping("/delete")
     public String deleteDatabase(@RequestParam String databaseName, @RequestParam(required = false) Boolean propagate) {
-        System.out.println("delete" + databaseName);
         dataBaseService.deleteDatabase(databaseName);
         if (propagate == null || propagate) {
             if (loadBalancingManager.isRedirectRequired()) {
-                System.out.println("This request will be redirected to a different node");
                 String uri = RequestManager.buildUri(ClusterManager.get(ClusterManager.nextNode()), "/database/delete", databaseName, null, null, null, null, null);
                 restTemplate.getForEntity(uri, null, String.class);
             } else {

@@ -16,7 +16,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class DatabaseService {
 
     public void createDatabase(String databaseName) throws IOException {
-//        DatabaseManager.getInstance().getDatabaseLock().writeLock().lock();
         try {
             if (FileManager.fileExists(FileManager.storagePath + "/" + databaseName)) {
                 System.out.println("database exists");
@@ -27,16 +26,14 @@ public class DatabaseService {
             database.setName(databaseName);
             DatabaseManager.getInstance().getDatabases().put(databaseName, database);
             DatabaseManager.getInstance().getDatabaseLock().put(databaseName, new ReentrantReadWriteLock());
-//            DatabaseManager.getInstance().getDatabaseLock().writeLock();
-        } finally {
-//            DatabaseManager.getInstance().getDatabaseLock().writeLock().unlock();
+        } catch (Exception e){
+            System.out.println(e);
         }
     }
 
     public void deleteDatabase(String databaseName) {
         LockManager.writeLockDatabase(databaseName);
         boolean deleted = false;
-//        DatabaseManager.getInstance().getDatabaseLock().writeLock().lock();
         try {
             if (!FileManager.fileExists(FileManager.storagePath + "/" + databaseName)) {
                 System.out.println("database doesnt exist");
@@ -55,20 +52,15 @@ public class DatabaseService {
             if(deleted) {
                 DatabaseManager.getInstance().getDatabaseLock().remove(databaseName);
             }
-//            DatabaseManager.getInstance().getDatabaseLock().writeLock().unlock();
         }
     }
 
     public List<String> getDatabases() {
-//        DatabaseManager.getInstance().getDatabaseLock().readLock().lock();
-//        DatabaseManager.getInstance().getDatabaseLock().forEach((s, reentrantReadWriteLock) -> reentrantReadWriteLock.readLock().lock());
-        LockManager.writeLockDatabases();
+        LockManager.readLockDatabases();
         try {
             return DatabaseManager.getInstance().getDatabases().keySet().stream().toList();
         } finally {
-            LockManager.writeUnlockDatabases();
-//            DatabaseManager.getInstance().getDatabaseLock().forEach((s, reentrantReadWriteLock) -> reentrantReadWriteLock.readLock().unlock());
-//            DatabaseManager.getInstance().getDatabaseLock().readLock().unlock();
+            LockManager.readUnlockDatabases();
         }
     }
 }

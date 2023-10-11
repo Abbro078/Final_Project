@@ -26,11 +26,10 @@ public class CollectionController {
     }
 
     @PostMapping("")
-    public ResponseEntity createCollection(@RequestParam String databaseName, @RequestParam String collectionName, @RequestBody String schema, @RequestParam(required = false) Boolean propagate) throws IOException {
+    public ResponseEntity<?> createCollection(@RequestParam String databaseName, @RequestParam String collectionName, @RequestBody String schema, @RequestParam(required = false) Boolean propagate) throws IOException {
         collectionService.createCollection(databaseName, collectionName, schema);
         if (propagate == null || propagate) {
             if (loadBalancingManager.isRedirectRequired()) {
-                System.out.println("This request will be redirected to a different node");
                 String uri = RequestManager.buildUri(ClusterManager.get(ClusterManager.nextNode()), "/collection", databaseName, collectionName, null, null, null, null);
                 restTemplate.postForObject(uri, schema, String.class);
             } else {
@@ -59,11 +58,11 @@ public class CollectionController {
     @GetMapping("/index")
     public String newIndex(@RequestParam String databaseName, @RequestParam String collectionName, @RequestParam String key, @RequestParam(required = false) Boolean propagate, @RequestParam(required = false) Boolean fromAffinityNode) throws IOException {
 
-//        if (ClusterManager.nodeIndex() == DatabaseManager.getAffinityNode(databaseName, collectionName) || (fromAffinityNode != null && fromAffinityNode)) {
+        if (ClusterManager.nodeIndex() == DatabaseManager.getAffinityNode(databaseName, collectionName) || (fromAffinityNode != null && fromAffinityNode)) {
             collectionService.newIndex(databaseName, collectionName, key);
             if (propagate == null || propagate) {
                 if (loadBalancingManager.isRedirectRequired()) {
-                    System.out.println("This request will be redirected to a different node");
+    
                     String uri = RequestManager.buildUri(ClusterManager.get(ClusterManager.nextNode()), "/collection", databaseName, collectionName, null, key, null, null);
                     restTemplate.getForEntity(uri, null, String.class);
                 } else {
@@ -76,10 +75,10 @@ public class CollectionController {
                     }
                 }
             }
-//        } else {
-//            String uri = RequestManager.buildUri(ClusterManager.get(DatabaseManager.getAffinityNode(databaseName, collectionName)), "/collection", databaseName, collectionName, null, key, null, null);
-//            restTemplate.getForEntity(uri, null, String.class);
-//        }
+        } else {
+            String uri = RequestManager.buildUri(ClusterManager.get(DatabaseManager.getAffinityNode(databaseName, collectionName)), "/collection", databaseName, collectionName, null, key, null, null);
+            restTemplate.getForEntity(uri, null, String.class);
+        }
         return "New key indexed";
     }
 
@@ -99,7 +98,7 @@ public class CollectionController {
             collectionService.deleteCollection(databaseName, collectionName);
             if (propagate == null || propagate) {
                 if (loadBalancingManager.isRedirectRequired()) {
-                    System.out.println("This request will be redirected to a different node");
+    
                     String uri = RequestManager.buildUri(ClusterManager.get(ClusterManager.nextNode()), "/collection/delete", databaseName, collectionName, null, null, null, null);
                     restTemplate.getForEntity(uri, null, String.class);
                 } else {
