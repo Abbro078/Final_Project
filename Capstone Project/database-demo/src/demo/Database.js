@@ -100,7 +100,7 @@ export default function database(){
         </CRow>
         <CModalFooter>
           <CButton color="secondary" onClick={() => setVisible(false)}>
-            Close
+            Closee
           </CButton>
           <CButton color="primary" onClick={()=>submit()}>Save changes</CButton>
         </CModalFooter>

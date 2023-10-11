@@ -114,7 +114,7 @@ export default function collection(){
           </CRow>
           <CModalFooter>
             <CButton color="secondary" onClick={() => setVisible(false)}>
-              Close
+              Closee
             </CButton>
             <CButton color="primary" onClick={()=>submit()}>Create</CButton>
           </CModalFooter>
